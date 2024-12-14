@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save Hawksbill Turtles</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #ffd180, #ffe0b2);
+            color: #3e2723;
+        }
+        header {
+            background: #bf360c;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 3em;
+        }
+        nav {
+            background: #d84315;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            text-align: center;
+        }
+        section h2 {
+            color: #bf360c;
+        }
+        .cta {
+            background-color: #d84315;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .cta:hover {
+            background-color: #bf360c;
+        }
+        footer {
+            background-color: #bf360c;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .game-container {
+            display: none;
+            padding: 20px;
+        }
+        .question {
+            margin: 20px 0;
+            font-size: 1.5em;
+        }
+        .options {
+            margin: 20px 0;
+        }
+        .options button {
+            background-color: #81c784;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .options button:hover {
+            background-color: #66bb6a;
+        }
+        #feedback {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Save Hawksbill Turtles</h1>
+        <p>Protecting these beautiful marine creatures from extinction</p>
+    </header>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#importance">Importance</a>
+        <a href="#threats">Threats</a>
+        <a href="#game-section">Play the Game</a>
+    </nav>
+    <section id="home">
+        <h2>Welcome to Save Hawksbill Turtles</h2>
+        <p>Explore our site to learn about Hawksbill turtles and play a fun, challenging game to test your knowledge.</p>
+    </section>
+    <section id="importance">
+        <h2>Why Hawksbill Turtles Matter</h2>
+        <p>Hawksbill turtles are crucial for the health of coral reefs. By feeding on sponges, they prevent the reefs from being overgrown, allowing other marine life to thrive.</p>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/Eretmochelys_imbricata_01.jpg" alt="Hawksbill Turtle" width="300">
+    </section>
+    <section id="threats">
+        <h2>Threats to Hawksbill Turtles</h2>
+        <ul>
+            <li>Climate Change</li>
+            <li>Illegal Trade for Their Shells</li>
+            <li>Pollution</li>
+            <li>Habitat Destruction</li>
+        </ul>
+    </section>
+    <section id="game-section" class="game-container">
+        <h2>Turtle Trivia Challenge</h2>
+        <div id="question-container">
+            <p class="question"></p>
+            <div class="options"></div>
+        </div>
+        <div id="feedback"></div>
+        <button id="next-question" style="display: none;">Next Question</button>
+    </section>
+    <footer>
+        <p>© 2024 Save Hawksbill Turtles Initiative</p>
+    </footer>
+    <script>
+        const questions = [
+            {
+                question: "What is the scientific name of the Hawksbill Turtle?",
+                options: ["Eretmochelys imbricata", "Chelonia mydas", "Dermochelys coriacea", "Caretta caretta"],
+                answer: "Eretmochelys imbricata"
+            },
+            {
+                question: "What do Hawksbill turtles primarily eat?",
+                options: ["Sponges", "Fish", "Seaweed", "Crustaceans"],
+                answer: "Sponges"
+            },
+            {
+                question: "How many years can a Hawksbill turtle live?",
+                options: ["30-50 years", "50-100 years", "20-30 years", "10-20 years"],
+                answer: "50-100 years"
+            },
+            {
+                question: "Why are Hawksbill turtles critically endangered?",
+                options: [
+                    "Illegal trade for their shells",
+                    "Habitat destruction",
+                    "Climate change",
+                    "All of the above"
+                ],
+                answer: "All of the above"
+            },
+            {
+                question: "In which ocean are Hawksbill turtles NOT commonly found?",
+                options: ["Atlantic", "Pacific", "Indian", "Arctic"],
+                answer: "Arctic"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const gameSection = document.querySelector("#game-section");
+        const questionElement = document.querySelector(".question");
+        const optionsContainer = document.querySelector(".options");
+        const feedbackElement = document.getElementById("feedback");
+        const nextQuestionButton = document.getElementById("next-question");
+
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').slice(1);
+                document.querySelectorAll('section').forEach(section => {
+                    section.style.display = section.id === targetId ? 'block' : 'none';
+                });
+            });
+        });
+
+        function loadQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            questionElement.textContent = currentQuestion.question;
+            optionsContainer.innerHTML = "";
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.onclick = () => checkAnswer(option, currentQuestion.answer);
+                optionsContainer.appendChild(button);
+            });
+            feedbackElement.textContent = "";
+            nextQuestionButton.style.display = "none";
+        }
+
+        function checkAnswer(selectedOption, correctAnswer) {
+            if (selectedOption === correctAnswer) {
+                feedbackElement.textContent = "Correct! 🎉";
+                feedbackElement.style.color = "green";
+                score++;
+            } else {
+                feedbackElement.textContent = `Wrong! The correct answer was "${correctAnswer}".`;
+                feedbackElement.style.color = "red";
+            }
+            nextQuestionButton.style.display = "inline-block";
+        }
+
+        nextQuestionButton.addEventListener("click", () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showFinalScore();
+            }
+        });
+
+        function showFinalScore() {
+            questionElement.textContent = `Game Over! Your Score: ${score}/${questions.length}`;
+            optionsContainer.innerHTML = "";
+            feedbackElement.textContent = "Thank you for playing!";
+            nextQuestionButton.style.display = "none";
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save Hawksbill Turtles</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #ffd180, #ffe0b2);
+            color: #3e2723;
+        }
+        header {
+            background: #bf360c;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 3em;
+        }
+        nav {
+            background: #d84315;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            text-align: center;
+        }
+        section h2 {
+            color: #bf360c;
+        }
+        .cta {
+            background-color: #d84315;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .cta:hover {
+            background-color: #bf360c;
+        }
+        footer {
+            background-color: #bf360c;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .game-container {
+            display: none;
+            padding: 20px;
+        }
+        .question {
+            margin: 20px 0;
+            font-size: 1.5em;
+        }
+        .options {
+            margin: 20px 0;
+        }
+        .options button {
+            background-color: #81c784;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .options button:hover {
+            background-color: #66bb6a;
+        }
+        #feedback {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Save Hawksbill Turtles</h1>
+        <p>Protecting these beautiful marine creatures from extinction</p>
+    </header>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#importance">Importance</a>
+        <a href="#threats">Threats</a>
+        <a href="#game-section">Play the Game</a>
+    </nav>
+    <section id="home">
+        <h2>Welcome to Save Hawksbill Turtles</h2>
+        <p>Explore our site to learn about Hawksbill turtles and play a fun, challenging game to test your knowledge.</p>
+    </section>
+    <section id="importance">
+        <h2>Why Hawksbill Turtles Matter</h2>
+        <p>Hawksbill turtles are crucial for the health of coral reefs. By feeding on sponges, they prevent the reefs from being overgrown, allowing other marine life to thrive.</p>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/Eretmochelys_imbricata_01.jpg" alt="Hawksbill Turtle" width="300">
+    </section>
+    <section id="threats">
+        <h2>Threats to Hawksbill Turtles</h2>
+        <ul>
+            <li>Climate Change</li>
+            <li>Illegal Trade for Their Shells</li>
+            <li>Pollution</li>
+            <li>Habitat Destruction</li>
+        </ul>
+    </section>
+    <section id="game-section" class="game-container">
+        <h2>Turtle Trivia Challenge</h2>
+        <div id="question-container">
+            <p class="question"></p>
+            <div class="options"></div>
+        </div>
+        <div id="feedback"></div>
+        <button id="next-question" style="display: none;">Next Question</button>
+    </section>
+    <footer>
+        <p>© 2024 Save Hawksbill Turtles Initiative</p>
+    </footer>
+    <script>
+        const questions = [
+            {
+                question: "What is the scientific name of the Hawksbill Turtle?",
+                options: ["Eretmochelys imbricata", "Chelonia mydas", "Dermochelys coriacea", "Caretta caretta"],
+                answer: "Eretmochelys imbricata"
+            },
+            {
+                question: "What do Hawksbill turtles primarily eat?",
+                options: ["Sponges", "Fish", "Seaweed", "Crustaceans"],
+                answer: "Sponges"
+            },
+            {
+                question: "How many years can a Hawksbill turtle live?",
+                options: ["30-50 years", "50-100 years", "20-30 years", "10-20 years"],
+                answer: "50-100 years"
+            },
+            {
+                question: "Why are Hawksbill turtles critically endangered?",
+                options: [
+                    "Illegal trade for their shells",
+                    "Habitat destruction",
+                    "Climate change",
+                    "All of the above"
+                ],
+                answer: "All of the above"
+            },
+            {
+                question: "In which ocean are Hawksbill turtles NOT commonly found?",
+                options: ["Atlantic", "Pacific", "Indian", "Arctic"],
+                answer: "Arctic"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const gameSection = document.querySelector("#game-section");
+        const questionElement = document.querySelector(".question");
+        const optionsContainer = document.querySelector(".options");
+        const feedbackElement = document.getElementById("feedback");
+        const nextQuestionButton = document.getElementById("next-question");
+
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').slice(1);
+                document.querySelectorAll('section').forEach(section => {
+                    section.style.display = section.id === targetId ? 'block' : 'none';
+                });
+            });
+        });
+
+        function loadQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            questionElement.textContent = currentQuestion.question;
+            optionsContainer.innerHTML = "";
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.onclick = () => checkAnswer(option, currentQuestion.answer);
+                optionsContainer.appendChild(button);
+            });
+            feedbackElement.textContent = "";
+            nextQuestionButton.style.display = "none";
+        }
+
+        function checkAnswer(selectedOption, correctAnswer) {
+            if (selectedOption === correctAnswer) {
+                feedbackElement.textContent = "Correct! 🎉";
+                feedbackElement.style.color = "green";
+                score++;
+            } else {
+                feedbackElement.textContent = `Wrong! The correct answer was "${correctAnswer}".`;
+                feedbackElement.style.color = "red";
+            }
+            nextQuestionButton.style.display = "inline-block";
+        }
+
+        nextQuestionButton.addEventListener("click", () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showFinalScore();
+            }
+        });
+
+        function showFinalScore() {
+            questionElement.textContent = `Game Over! Your Score: ${score}/${questions.length}`;
+            optionsContainer.innerHTML = "";
+            feedbackElement.textContent = "Thank you for playing!(I had some help from chatgpt lol)";
+            nextQuestionButton.style.display = "none";
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
